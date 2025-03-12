@@ -4,11 +4,12 @@ const mongoose = require("mongoose");
 
 const router = express.Router();
 
-// ✅ Updated Schema with Shared Users
+// ✅ Updated Schema with Name and Shared Users
 const UrlSchema = new mongoose.Schema({
   originalUrl: String,
   shortUrl: { type: String, unique: true },
   email: String, // Owner's email
+  name: String, // ✅ Added name field
   sharedWith: [{ type: String }], // Users the URL is shared with
 });
 
@@ -16,7 +17,7 @@ const Url = mongoose.model("Url", UrlSchema);
 
 // ✅ Create Short URL (Allow Custom Short URL)
 router.post("/shorten", async (req, res) => {
-  let { originalUrl, email, customShortUrl } = req.body;
+  let { originalUrl, email, customShortUrl, name } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
@@ -37,7 +38,7 @@ router.post("/shorten", async (req, res) => {
     }
   }
 
-  const url = new Url({ originalUrl, shortUrl, email });
+  const url = new Url({ originalUrl, shortUrl, email, name }); // ✅ Store name
 
   await url.save();
   res.json({
